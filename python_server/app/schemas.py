@@ -75,6 +75,7 @@ class VisionOutput(BaseModel):
     corridor_end_confidence: float = 0.0
     side_openings: dict[str, bool] = Field(default_factory=lambda: {"left": False, "right": False})
     forward_flow: float = 0.0
+    frame_similarity: float = 1.0
     landmark_tokens: list[str] = Field(default_factory=list)
     text_tokens: list[str] = Field(default_factory=list)
     vlm_used: bool = False
@@ -88,4 +89,5 @@ class EventDecision(BaseModel):
     turn_angle_deg: float = 0.0
     create_new_cell: bool = False
     cell_type_hint: str = "corridor_segment"
+    boundary_reason: str | None = None
     debug: dict[str, Any] = Field(default_factory=dict)

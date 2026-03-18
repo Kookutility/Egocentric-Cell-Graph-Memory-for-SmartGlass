@@ -14,6 +14,7 @@ class FsmSnapshot:
     state: str
     confirm_counter: int = 0
     cooldown_until_ts: float = 0.0
+    pending_reason: str | None = None
 
 
 class RuntimeStateMachine:
@@ -27,22 +28,33 @@ class RuntimeStateMachine:
         if timestamp < self.snapshot.cooldown_until_ts:
             self.snapshot.state = "IN_CELL"
             self.snapshot.confirm_counter = 0
+            self.snapshot.pending_reason = None
             return self.snapshot.state
 
-        # FSM transition comments are kept explicit to make debugging and tuning easier.
-        if decision.event == "door_candidate":
+        if decision.event in {"door_candidate", "door_occluded"} and not decision.create_new_cell:
             state = "DOOR_CANDIDATE"
+            self.snapshot.confirm_counter = 0
+            self.snapshot.pending_reason = decision.boundary_reason
         elif decision.event == "turn_candidate":
             state = "TURN_CANDIDATE"
-        elif decision.event == "decision_candidate":
+            self.snapshot.confirm_counter = 0
+            self.snapshot.pending_reason = None
+        elif decision.event == "decision_candidate" and not decision.create_new_cell:
             state = "DECISION_CANDIDATE"
+            self.snapshot.confirm_counter = 0
+            self.snapshot.pending_reason = decision.boundary_reason
         elif decision.create_new_cell:
             state = "CONFIRM_BOUNDARY"
-            self.snapshot.confirm_counter += 1
+            if decision.boundary_reason == self.snapshot.pending_reason:
+                self.snapshot.confirm_counter += 1
+            else:
+                self.snapshot.confirm_counter = 1
+                self.snapshot.pending_reason = decision.boundary_reason
             if self.snapshot.confirm_counter >= CONFIG.boundary_confirm_frames:
                 state = "NEW_CELL"
-                self.snapshot.cooldown_until_ts = timestamp + CONFIG.new_cell_cooldown_s
+                self.snapshot.cooldown_until_ts = timestamp + CONFIG.boundary_cooldown_s
                 self.snapshot.confirm_counter = 0
+                self.snapshot.pending_reason = None
         else:
             if imu.strong_turn and imu.stable_heading:
                 state = "TURN_CANDIDATE"
@@ -50,7 +62,8 @@ class RuntimeStateMachine:
                 state = "DECISION_CANDIDATE"
             else:
                 state = "IN_CELL"
-                self.snapshot.confirm_counter = 0
+            self.snapshot.confirm_counter = 0
+            self.snapshot.pending_reason = None
 
         self.snapshot.state = state
         return state

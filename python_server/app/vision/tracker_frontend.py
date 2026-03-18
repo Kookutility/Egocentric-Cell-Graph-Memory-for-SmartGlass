@@ -60,5 +60,10 @@ class TrackerFrontend:
                 self._track_age.pop(track_id, None)
         return assigned
 
+    def active_tracks(self) -> list[Detection]:
+        """Returns the latest tracked detections for frames where detection is intentionally skipped."""
+
+        return [tracked.model_copy(deep=True) for tracked in self._tracks.values()]
+
     def track_age(self, track_id: int | None) -> int:
         return 0 if track_id is None else self._track_age.get(track_id, 0)

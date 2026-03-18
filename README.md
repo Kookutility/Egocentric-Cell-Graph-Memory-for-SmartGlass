@@ -70,6 +70,8 @@ uvicorn app.server:app --host 127.0.0.1 --port 8000
 
 Detailed setup notes are in `Assets/Scenes/DemoIndoorScene.md`.
 
+For a full Korean step-by-step install/run guide, see `docs/SETUP_KO.md`.
+
 ## HTTP endpoints
 
 - `POST /session/start`

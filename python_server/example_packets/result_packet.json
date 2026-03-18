@@ -1,0 +1,24 @@
+{
+  "frame_id": 1024,
+  "fsm_state": "IN_CELL",
+  "cell_id": 7,
+  "cell_type": "corridor_segment",
+  "event": "turn_right",
+  "instruction": "오른쪽으로 도세요",
+  "confidence": 0.91,
+  "graph_summary": {
+    "num_cells": 8,
+    "num_edges": 7
+  },
+  "debug": {
+    "scene_label": "corridor",
+    "axis_confidence": 0.79
+  },
+  "top_candidates": [
+    {
+      "cell_id": 5,
+      "score": 0.71
+    }
+  ],
+  "vlm_used": false
+}

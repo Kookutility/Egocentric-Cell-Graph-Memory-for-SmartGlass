@@ -1,0 +1,8 @@
+{
+  "session_id": "demo_001",
+  "frame_id": 1024,
+  "timestamp": 123.456,
+  "yaw_deg": 87.2,
+  "step_count": 54,
+  "jpg_b64": "<base64_jpg_bytes>"
+}

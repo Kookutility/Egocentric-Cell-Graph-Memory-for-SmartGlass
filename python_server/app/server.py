@@ -26,6 +26,7 @@ def _require_runtime():
 
 @app.post("/session/start", response_model=SessionControlResponse)
 def start_session(payload: SessionStartRequest) -> SessionControlResponse:
+    engine.reset()
     runtime = SESSION_STORE.start(payload.session_id)
     return SessionControlResponse(ok=True, session_id=runtime.session_id, message="session started")
 
@@ -35,6 +36,7 @@ def reset_session() -> SessionControlResponse:
     runtime = SESSION_STORE.reset()
     if runtime is None:
         raise HTTPException(status_code=404, detail="No active session")
+    engine.reset()
     return SessionControlResponse(ok=True, session_id=runtime.session_id, message="session reset")
 
 
@@ -44,6 +46,7 @@ def stop_session() -> SessionControlResponse:
     if runtime is None:
         raise HTTPException(status_code=404, detail="No active session")
     export_json(runtime.output_dir / "graph.json", runtime.graph.export())
+    engine.reset()
     return SessionControlResponse(
         ok=True,
         session_id=runtime.session_id,

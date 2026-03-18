@@ -24,6 +24,7 @@ class StepEstimator:
     def update(self, timestamp: float, step_count: int | None) -> StepState:
         if step_count is not None:
             self._step_count = step_count
+            self._last_timestamp = timestamp
             return StepState(step_count=step_count, distance_m=step_count * CONFIG.step_length_est_m, used_fallback=False)
         if self._last_timestamp is None:
             self._last_timestamp = timestamp
